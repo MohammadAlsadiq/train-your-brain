@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description"
+        content="An interactive Learning How to Learn project: practice recall, plan spaced reviews, and build a focused study routine.">
+    <title>Train Your Brain | Mohammad Alsadiq</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body><a class="skip" href="#lab">Skip to activities</a>
+    <div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+    <nav aria-label="Main navigation"><a href="#">M<span class="logo-dot">.</span> / learning lab</a><button
+            class="menu-toggle secondary" id="menuToggle" aria-expanded="false" aria-controls="navLinks">Menu +</button>
+        <div id="navLinks"><a href="#recall">Recall</a><a href="#spacing">Space</a><a href="#focus">Focus</a><a
+                href="#cards">Cards</a><a href="#reflection">Reflect</a><a href="#sources">Sources</a></div>
+    </nav>
+    <main>
+        <header>
+            <div>
+                <div class="eyebrow">Learning How to Learn · Final Project</div>
+                <h1>Learn with intention.<br><em>Remember with practice.</em></h1>
+                <p class="lead">A small, hands-on lab for turning familiar information into knowledge you can actually
+                    use.</p><a class="button" href="#recall">Try the learning lab ↓</a>
+                <div class="meta">By Mohammad Alsadiq · For students and independent learners</div>
+            </div>
+            <div class="hero-console">
+                <div class="console-top"><span class="console-dots">● ●
+                        ●</span><span>learning.session</span><span>v2.0</span></div>
+                <div class="console-body">
+                    <p class="small">// a better learning loop</p>
+                    <p><span class="code-purple">const</span> learner = <span class="code-cyan">you</span>;</p>
+                    <p>while (curious) {</p>
+                    <div class="code-indent">
+                        <p>understand();</p>
+                        <p>practice();</p>
+                        <p class="code-cyan">retrieve(); <span class="small">← try without notes</span></p>
+                        <p>reflect();</p>
+                    </div>
+                    <p>}</p>
+                    <div class="console-status"><span class="status-dot"></span> Ready for your next discovery</div>
+                </div>
+            </div>
+        </header>
+        <aside class="dashboard" aria-label="Learning lab progress">
+            <div><span class="tag">Your lab session</span>
+                <p><b id="progressLabel">0 / 4 checkpoints</b><span class="small"> · Explore at your own pace</span></p>
+            </div>
+            <div class="progress-track"><span id="activityBar"></span></div><a href="#reflection" class="text-link">Open
+                notebook ↗</a>
+        </aside>
+        <div class="strip" id="lab"><span>01 / TEST YOUR RECALL</span><span>02 / SPACE YOUR PRACTICE</span><span>03 /
+                START SMALL</span><span>04 / CHOOSE A STRATEGY</span></div>
+        <section id="recall">
+            <div class="intro"><span class="eyebrow">01 / Recall & illusions of competence</span>
+                <h2>Familiar doesn’t always mean learned.</h2>
+                <p>Reading a solution can feel effortless because the answer is right in front of you. Closing it and
+                    reconstructing the idea reveals what you can retrieve independently. Use that gap to decide what to
+                    practice next. <a href="#ref2">[2]</a></p>
+            </div>
+            <div class="grid">
+                <div>
+                    <h3>The code-reading trap</h3>
+                    <p>You follow a binary-search tutorial and every line makes sense. Tomorrow, can you explain the
+                        algorithm and implement it on a blank page? Try recalling first, then compare with a reliable
+                        solution and correct mistakes.</p>
+                    <p class="note">Boxing analogy: recognizing a combination in a demonstration is different from
+                        producing it during practice. This is an analogy, not evidence that studying and sport work
+                        identically.</p>
+                    <h3>Make it a habit</h3>
+                    <p>After a short study block, close your notes. Write the main ideas, solve one problem, and check
+                        your work. Revisit the errors rather than only rereading the easy parts.</p>
+                </div>
+                <div class="panel"><span class="tag">Try it / a tiny recall experiment</span>
+                    <div id="study">
+                        <p style="margin-top:16px">Study these three ideas, then hide them:</p>
+                        <ul>
+                            <li><b>Retrieve:</b> bring an idea to mind without looking.</li>
+                            <li><b>Check:</b> compare your attempt with a reliable answer.</li>
+                            <li><b>Repair:</b> correct the gap and try again later.</li>
+                        </ul><button id="hideStudy">Hide & try recalling</button>
+                    </div>
+                    <div id="attempt" hidden><label for="confidence">Before answering, how many steps can you
+                            recall?</label><select id="confidence">
+                            <option value="0">0 of 3</option>
+                            <option value="1">1 of 3</option>
+                            <option value="2">2 of 3</option>
+                            <option value="3" selected>3 of 3</option>
+                        </select><label for="recallText">Name the steps and explain them from memory.</label><textarea
+                            id="recallText" placeholder="Write your attempt here…"></textarea><button id="reveal"
+                            style="margin-top:12px">Compare with the answer</button>
+                        <div id="answer" hidden>
+                            <p class="feedback"><b>Retrieve → Check → Repair.</b> Recall without notes, compare with an
+                                answer, then correct errors and revisit later.</p><label for="actual">How many did you
+                                explain correctly? Self-assess honestly.</label><select id="actual">
+                                <option value="">Choose your result</option>
+                                <option>0</option>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
+                            <div id="calibration" class="feedback" role="status"></div><button class="secondary"
+                                id="retry">Try again</button>
+                        </div>
+                    </div>
+                    <p class="small" style="margin-top:16px">An illustration of recall and confidence, not a scientific
+                        measurement of your memory.</p>
+                </div>
+            </div>
+        </section>
+        <section id="spacing">
+            <div class="intro"><span class="eyebrow">02 / Spaced practice</span>
+                <h2>Return to it. Give it time.</h2>
+                <p>Spread practice across separate sessions instead of putting every repetition into one sitting. In
+                    each review, attempt recall before checking your notes. Adjust the interval when recall is too
+                    difficult or too easy. <a href="#ref3">[3]</a></p>
+            </div>
+            <div class="grid">
+                <div class="panel tint">
+                    <h3>Build a review plan</h3><label for="topic">What are you learning?</label><input id="topic"
+                        maxlength="100" placeholder="e.g., binary search"><label for="startDate">First study
+                        date</label><input type="date" id="startDate"><button id="plan" style="margin-top:18px">Create
+                        my review plan ↗</button>
+                    <div id="planActions" class="controls" hidden><button id="savePlan" class="secondary">Save
+                            plan</button><button id="exportCalendar" class="secondary">Export calendar</button></div>
+                    <p class="small" style="margin-top:15px">Example intervals: 1, 3, 7, and 14 days after first study.
+                        These are a starting point, not a universally optimal schedule.</p>
+                </div>
+                <div class="panel">
+                    <h3 id="planTitle">Your next encounters</h3>
+                    <div id="planResult" aria-live="polite">
+                        <p class="small">Choose a topic and date to see your plan.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="saved-plans">
+                <h3>Saved review plans</h3>
+                <p class="small">Keep a few topics here. Mark each review when you actually finish it.</p>
+                <div id="savedPlans"></div>
+                <p id="plannerStatus" role="status" class="small"></p>
+            </div>
+        </section>
+        <section id="focus">
+            <div class="intro"><span class="eyebrow">03 / Procrastination & process</span>
+                <h2>Don’t finish everything. Start something.</h2>
+                <p>An intimidating outcome—“finish the whole chapter”—can make starting harder. Set a short process
+                    goal: “work on one problem for 25 minutes.” Remove a distraction, work until the timer ends, then
+                    take a break. The course presents the Pomodoro technique as one way to begin. <a
+                        href="#ref1">[1]</a></p>
+            </div>
+            <div class="grid">
+                <div>
+                    <h3>A simple starting ritual</h3>
+                    <ol>
+                        <li><b>Notice the cue:</b> a difficult task makes you reach for your phone.</li>
+                        <li><b>Change the routine:</b> put the phone away and open one problem.</li>
+                        <li><b>Work for a bounded time:</b> focus on the process, not completing the whole assignment.
+                        </li>
+                        <li><b>Take a small reward:</b> step away for a brief break.</li>
+                    </ol>
+                    <p class="note">A timer supports a routine; it does not guarantee concentration or learning. End the
+                        session by recalling what you worked on.</p>
+                </div>
+                <div class="panel"><label for="goal">One small task for this session</label><input id="goal"
+                        maxlength="120" placeholder="Explain one algorithm without my notes"><label
+                        for="mode">Session</label><select id="mode">
+                        <option value="25">Focus · 25 minutes</option>
+                        <option value="5">Break · 5 minutes</option>
+                    </select>
+                    <div class="timer-orbit" id="timerOrbit">
+                        <div class="clock" id="clock" role="timer" aria-label="Time remaining">25:00</div>
+                    </div>
+                    <div class="controls"><button id="timerToggle">Start</button><button id="timerReset"
+                            class="secondary">Reset</button></div>
+                    <p class="small">Completed focus sessions: <b id="sessionCount">0</b></p>
+                    <p id="timerStatus" role="status" class="small">Ready when you are. Keep this page open.</p>
+                </div>
+            </div>
+        </section>
+        <section id="strategy">
+            <div class="intro"><span class="eyebrow">04 / Focused & diffuse thinking · Chunking · Interleaving</span>
+                <h2>Choose how to practice.</h2>
+                <p>The course uses focused and diffuse modes as a simplified way to describe concentrated work and
+                    broader thinking. First engage with a problem; a break may help you return with a different
+                    approach. It is not a switch you can control precisely. <a href="#ref1">[1]</a></p>
+            </div>
+            <div class="grid">
+                <div>
+                    <h3>Build a chunk, then learn when to use it</h3>
+                    <p>A chunk is a meaningful set of connected ideas you can use together. In coding, understand a
+                        worked example, reconstruct the method without looking, and practice applying it. Memorizing
+                        lines without understanding their purpose is a fragile shortcut.</p>
+                    <p>Once you understand individual methods, mix related problem types. This is <b>interleaving</b>:
+                        practice choosing a method as well as executing it. For example, mix search and traversal tasks
+                        instead of labeling every task “use binary search.” <a href="#ref1">[1]</a></p>
+                </div>
+                <div class="panel"><span class="tag">Practice decision / <span id="scenarioNum">1</span> of 3</span>
+                    <p class="scenario" id="scenario" style="margin-top:17px"></p>
+                    <div id="choices"></div>
+                    <div id="strategyFeedback" role="status" class="feedback"></div><button id="nextScenario"
+                        class="secondary" style="margin-top:16px" hidden>Next situation →</button>
+                </div>
+            </div>
+        </section>
+        <section id="cards">
+            <div class="intro"><span class="eyebrow">05 / Retrieval studio</span>
+                <h2>Think first. Flip second.</h2>
+                <p>Use these prompts to explain an idea before looking at its answer. Rate your recall honestly, then
+                    revisit the difficult cards. You can also add a question from your own studies.</p>
+            </div>
+            <div class="grid">
+                <div class="panel flashcard-panel">
+                    <div class="card-meta"><span class="tag" id="cardCounter">Card 1</span><span id="cardTopic"
+                            class="pill">Recall</span></div><button id="flashcard" class="flashcard"
+                        aria-label="Reveal flashcard answer"><span id="cardSide" class="tag">Question</span><span
+                            id="cardContent"></span><span id="flipHint" class="small">Think of your answer, then click
+                            to reveal ↻</span></button>
+                    <div class="controls" id="cardRating" hidden><button id="cardAgain" class="secondary">Practice
+                            again</button><button id="cardKnow">Recalled it</button></div>
+                    <div class="card-footer"><button id="prevCard" class="secondary"
+                            aria-label="Previous card">←</button><span id="cardMastery" class="small"></span><button
+                            id="nextCard" class="secondary" aria-label="Next card">→</button></div>
+                    <p id="cardStatus" class="small" role="status"></p>
+                    <div class="controls"><button id="difficultCards" class="secondary">Review difficult
+                            cards</button><button id="allCards" class="secondary">All cards</button></div>
+                </div>
+                <div class="panel">
+                    <h3>Make knowledge retrievable.</h3>
+                    <p class="small">A useful prompt asks you to explain or apply something—not just recognize a
+                        familiar term.</p>
+                    <form id="addCard"><label for="customQuestion">Your question</label><textarea id="customQuestion"
+                            maxlength="300" required
+                            placeholder="Why does binary search require sorted data?"></textarea><label
+                            for="customAnswer">An answer you have checked</label><textarea id="customAnswer"
+                            maxlength="800" required placeholder="Explain it in your own words…"></textarea><button
+                            type="submit">Add my flashcard +</button>
+                        <p id="addCardStatus" role="status" class="small"></p>
+                    </form><button id="deleteCard" class="secondary" hidden>Delete this custom card</button>
+                </div>
+            </div>
+        </section>
+        <section id="reflection">
+            <div class="intro"><span class="eyebrow">06 / Your learning notebook</span>
+                <h2>Turn an activity into an insight.</h2>
+                <p>Reflect on what you could explain without help. Use specific evidence from an attempt to decide what
+                    to change next.</p>
+            </div>
+            <div class="grid">
+                <div class="panel"><label for="reflectionText">What did I discover, and what will I try
+                        next?</label><textarea id="reflectionText" maxlength="6000"
+                        placeholder="I thought I understood… When I tried without notes… Next time I will…"></textarea>
+                    <div class="controls"><button id="saveReflection">Save reflection</button><button
+                            id="downloadReflection" class="secondary">Download notebook ↓</button></div>
+                    <p id="reflectionStatus" role="status" class="small"></p>
+                </div>
+                <div class="panel">
+                    <h3>Your checkpoints</h3>
+                    <ul class="checkpoints" id="checkpoints"></ul>
+                    <p class="small" id="storageStatus">Plans, custom cards, progress, and saved reflections are stored
+                        only in this browser. This is activity progress, not a course grade.</p><button
+                        class="secondary danger" id="clearProgress">Reset saved lab data</button>
+                    <div id="resetConfirm" hidden>
+                        <p>Clear this lab’s saved plans, custom cards, reflection, and progress from this browser?</p>
+                        <div class="controls"><button id="confirmReset">Yes, reset lab</button><button id="cancelReset"
+                                class="secondary">Keep my data</button></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="personal"><span class="eyebrow">Putting it into my life</span>
+            <h2>From the classroom to the training room.</h2>
+            <div class="grid">
+                <div>
+                    <p>I am a computer science student and an amateur boxer. I chose an interactive website to connect
+                        learning techniques with situations that matter to me and to make them useful to other learners.
+                    </p>
+                    <p>In my study plan, I will explain algorithms from memory, revisit difficult concepts across
+                        several days, and use short focus sessions to make large assignments easier to start. Boxing
+                        gives me a useful analogy for deliberate practice: understanding an explanation is only the
+                        beginning.</p>
+                    <p class="small">This section describes my intended application. It does not report completed
+                        experiments or measured improvements.</p>
+                </div>
+                <div class="panel">
+                    <h3>My seven-day application plan</h3>
+                    <ul>
+                        <li><b>Day 1:</b> study one concept; explain it without notes and record gaps.</li>
+                        <li><b>Day 2:</b> retrieve it again and correct errors.</li>
+                        <li><b>Day 4:</b> mix it with a related problem type.</li>
+                        <li><b>Day 7:</b> attempt a new application without a worked solution.</li>
+                    </ul>
+                    <p>At each attempt, record what I could explain independently and which mistakes returned. I will
+                        use that record to adjust my next review.</p>
+                </div>
+            </div>
+            <details>
+                <summary>Project overview for peer reviewers</summary>
+                <p>This project is an English-language interactive learning guide for students and independent learners.
+                    It applies recall, illusions of competence, spaced practice, procrastination and process goals,
+                    focused/diffuse thinking, chunking, and interleaving. Activities illustrate these concepts; they are
+                    not controlled experiments. References appear below.</p>
+            </details>
+        </section>
+        <section id="sources"><span class="eyebrow">Keep exploring</span>
+            <h2>Sources & acknowledgments</h2>
+            <p class="small">Explanations are paraphrased. Examples, activities, and the sample review schedule are
+                educational applications of the ideas, not claims that a particular routine works for everyone.</p>
+            <ol class="ref">
+                <li id="ref1">B. Oakley and T. Sejnowski, <a
+                        href="https://www.coursera.org/learn/learning-how-to-learn">Learning How to Learn: Powerful
+                        mental tools to help you master tough subjects</a>, Coursera. Main course source for learning
+                    modes, chunking, illusions of learning, procrastination, and practice strategies.</li>
+                <li id="ref2">H. L. Roediger III and J. D. Karpicke, “Test-enhanced learning: Taking memory tests
+                    improves long-term retention,” <i>Psychological Science</i>, 17(3), 249–255, 2006. <a
+                        href="https://doi.org/10.1111/j.1467-9280.2006.01693.x">doi:10.1111/j.1467-9280.2006.01693.x</a>.
+                </li>
+                <li id="ref3">N. J. Cepeda, H. Pashler, E. Vul, J. T. Wixted, and D. Rohrer, “Distributed practice in
+                    verbal recall tasks: A review and quantitative synthesis,” <i>Psychological Bulletin</i>, 132(3),
+                    354–380, 2006. <a
+                        href="https://doi.org/10.1037/0033-2909.132.3.354">doi:10.1037/0033-2909.132.3.354</a>.</li>
+            </ol>
+        </section>
+        <footer>Train Your Brain · Mohammad Alsadiq · Learning How to Learn final project<br>No account or tracking.
+            Saved lab data stays in this browser; use Reset saved lab data to clear it. Unsaved recall attempts are
+            cleared on reload.<p class="small">Built with HTML, CSS & JavaScript · <a href="#">Back to top ↑</a></p>
+        </footer>
+    </main>
+</body>
+
+</html>
