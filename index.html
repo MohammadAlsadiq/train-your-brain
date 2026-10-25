@@ -208,13 +208,14 @@
         <section id="cards">
             <div class="intro"><span class="eyebrow">05 / Retrieval studio</span>
                 <h2>Think first. Flip second.</h2>
-                <p>Use these prompts to explain an idea before looking at its answer. Rate your recall honestly, then
-                    revisit the difficult cards. You can also add a question from your own studies.</p>
+                <p>Build a deck for what you are studying today. Add your own questions and checked answers, practice
+                    recalling them, then download the cards as a text notes file. Each visit starts with an empty deck.
+                </p>
             </div>
             <div class="grid">
                 <div class="panel flashcard-panel">
                     <div class="card-meta"><span class="tag" id="cardCounter">Card 1</span><span id="cardTopic"
-                            class="pill">Recall</span></div><button id="flashcard" class="flashcard"
+                            class="pill">This visit</span></div><button id="flashcard" class="flashcard"
                         aria-label="Reveal flashcard answer"><span id="cardSide" class="tag">Question</span><span
                             id="cardContent"></span><span id="flipHint" class="small">Think of your answer, then click
                             to reveal ↻</span></button>
@@ -225,10 +226,13 @@
                             id="nextCard" class="secondary" aria-label="Next card">→</button></div>
                     <p id="cardStatus" class="small" role="status"></p>
                     <div class="controls"><button id="difficultCards" class="secondary">Review difficult
-                            cards</button><button id="allCards" class="secondary">All cards</button></div>
+                            cards</button><button id="allCards" class="secondary">All cards</button></div><button
+                        id="downloadCards" disabled>Download my cards ↓</button>
+                    <p class="small session-note">Cards and self-ratings last only for this visit. Download them before
+                        you leave or reload. They are also included in the notebook download below.</p>
                 </div>
                 <div class="panel">
-                    <h3>Make knowledge retrievable.</h3>
+                    <h3>Create your study cards.</h3>
                     <p class="small">A useful prompt asks you to explain or apply something—not just recognize a
                         familiar term.</p>
                     <form id="addCard"><label for="customQuestion">Your question</label><textarea id="customQuestion"
@@ -259,11 +263,13 @@
                 <div class="panel">
                     <h3>Your checkpoints</h3>
                     <ul class="checkpoints" id="checkpoints"></ul>
-                    <p class="small" id="storageStatus">Plans, custom cards, progress, and saved reflections are stored
-                        only in this browser. This is activity progress, not a course grade.</p><button
-                        class="secondary danger" id="clearProgress">Reset saved lab data</button>
+                    <p class="small" id="storageStatus">Plans, progress, and saved reflections are stored only in this
+                        browser. Flashcards last only for this visit; download them to keep a copy. This is activity
+                        progress, not a course grade.</p><button class="secondary danger" id="clearProgress">Reset saved
+                        lab data</button>
                     <div id="resetConfirm" hidden>
-                        <p>Clear this lab’s saved plans, custom cards, reflection, and progress from this browser?</p>
+                        <p>Clear saved plans, reflection, and progress from this browser, plus any flashcards from this
+                            visit?</p>
                         <div class="controls"><button id="confirmReset">Yes, reset lab</button><button id="cancelReset"
                                 class="secondary">Keep my data</button></div>
                     </div>
@@ -324,8 +330,9 @@
             </ol>
         </section>
         <footer>Train Your Brain · Mohammad Alsadiq · Learning How to Learn final project<br>No account or tracking.
-            Saved lab data stays in this browser; use Reset saved lab data to clear it. Unsaved recall attempts are
-            cleared on reload.<p class="small">Built with HTML, CSS & JavaScript · <a href="#">Back to top ↑</a></p>
+            Saved lab data stays in this browser; use Reset saved lab data to clear it. Flashcards and unsaved recall
+            attempts are cleared on reload. Download your cards to keep them.<p class="small">Built with HTML, CSS &
+                JavaScript · <a href="#">Back to top ↑</a></p>
         </footer>
     </main>
 </body>

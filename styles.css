@@ -1032,3 +1032,9 @@ footer p {
       display: block
    }
 }
+
+.session-note {
+   margin-top: 16px;
+   padding-left: 14px;
+   border-left: 2px solid var(--color-accent-secondary)
+}

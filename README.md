@@ -8,7 +8,7 @@ An interactive website created for my **Learning How to Learn** final project on
 - Spaced-review planner with calendar export
 - Pomodoro focus and break timer
 - Learning strategy activities
-- Flashcards with custom questions and difficult-card practice
+- Create your own flashcards each visit, practice difficult cards, and download the deck as text notes
 - Reflection notebook and progress saved in your browser
 
 ## Built With
@@ -35,7 +35,7 @@ Recall, illusions of competence, spaced practice, procrastination, focused and d
 
 ## Notes
 
-Saved data stays in the current browser and does not sync between devices. Use **Reset saved lab data** to clear it. Google Fonts requires an internet connection; fallback fonts are available.
+Plans, progress, and saved reflections stay in the current browser and do not sync between devices. Flashcards start empty each visit and are cleared on reload. Download your cards as a text file before leaving; they are also included in the notebook download. Use **Reset saved lab data** to clear it. Google Fonts requires an internet connection; fallback fonts are available.
 
 ## Author
 

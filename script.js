@@ -18,8 +18,11 @@ function showScenario() { $('scenarioNum').textContent = current + 1; $('scenari
 
 // Browser-local state. Storage failures never block the activities.
 const STORAGE_KEY = 'mohammad-learning-lab-v2';
-const blankState = () => ({ checkpoints: {}, plans: [], customCards: [], ratings: {}, reflection: '', sessions: 0, scenarios: [] });
+const blankState = () => ({ checkpoints: {}, plans: [], reflection: '', sessions: 0, scenarios: [] });
 let labState = blankState();
+// A fresh deck for each page visit; cards are exported rather than persisted.
+let sessionCards = [];
+let sessionRatings = {};
 let storageAvailable = true;
 try {
   const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
@@ -29,8 +32,6 @@ try {
     labState.sessions = Number.isSafeInteger(saved.sessions) && saved.sessions >= 0 ? saved.sessions : 0;
     labState.scenarios = Array.isArray(saved.scenarios) ? saved.scenarios.filter(n => [0, 1, 2].includes(n)) : [];
     labState.plans = Array.isArray(saved.plans) ? saved.plans.filter(p => typeof p.id === 'string' && typeof p.topic === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && !Number.isNaN(new Date(p.date + 'T12:00:00').getTime()) && Array.isArray(p.done)).slice(0, 10) : [];
-    labState.customCards = Array.isArray(saved.customCards) ? saved.customCards.filter(c => typeof c.id === 'string' && typeof c.q === 'string' && typeof c.a === 'string').slice(0, 30) : [];
-    labState.ratings = saved.ratings && typeof saved.ratings === 'object' ? saved.ratings : {};
   }
 } catch { storageAvailable = false; }
 function persist() {
@@ -86,34 +87,26 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && in
 $('sessionCount').textContent = labState.sessions;
 
 // Flashcards: explicit self-rating, custom prompts, difficult-card review.
-const builtInCards = [
-  { id: 'recall', topic: 'Recall', q: 'Why can rereading feel productive even when recall is weak?', a: 'Seeing an answer provides cues and familiarity. Try retrieving it without those cues, then check and repair your explanation.' },
-  { id: 'space', topic: 'Spacing', q: 'How would you change a one-night study marathon?', a: 'Distribute practice over separate sessions. Retrieve before checking notes, and adjust future intervals based on what you can recall.' },
-  { id: 'process', topic: 'Procrastination', q: 'Replace “finish the entire chapter” with a process goal.', a: 'For example: work on one problem for 25 minutes with the phone out of reach. Make starting specific and manageable.' },
-  { id: 'chunk', topic: 'Chunking', q: 'What makes an algorithm a useful chunk rather than memorized code?', a: 'You understand its connected steps, can reconstruct the method, and know when it applies. Practice with meaning and context.' },
-  { id: 'interleave', topic: 'Interleaving', q: 'After learning two methods separately, what should mixed practice require?', a: 'Choosing which method fits a problem and explaining why, as well as carrying out the method.' },
-  { id: 'diffuse', topic: 'Learning modes', q: 'When might a break help with a difficult problem?', a: 'After engaging in focused work, step away briefly and return to reconsider your approach. A break may help, but it is not a guaranteed solution.' }
-];
 let deck = [], cardIndex = 0, cardFlipped = false, difficultOnly = false;
-function allCards() { return [...builtInCards, ...labState.customCards.map(c => ({ ...c, topic: 'Your studies' }))]; }
-function buildDeck() { deck = allCards().filter(c => !difficultOnly || labState.ratings[c.id] === 'again'); cardIndex = Math.min(cardIndex, Math.max(0, deck.length - 1)); renderCard(); }
-function renderCard() { cardFlipped = false; const card = deck[cardIndex]; $('cardRating').hidden = true; $('flashcard').classList.remove('is-answer'); $('flashcard').setAttribute('aria-label', 'Reveal flashcard answer'); $('deleteCard').hidden = !card || !labState.customCards.some(c => c.id === card.id); $('flashcard').disabled = !card; $('prevCard').disabled = deck.length < 2; $('nextCard').disabled = deck.length < 2; $('cardCounter').textContent = card ? 'Card ' + (cardIndex + 1) + ' / ' + deck.length : 'No difficult cards'; $('cardTopic').textContent = card?.topic || 'All clear'; $('cardSide').textContent = 'Question'; $('cardContent').textContent = card?.q || 'Rate a card “Practice again” to add it here.'; $('flipHint').hidden = !card; $('flipHint').textContent = 'Think of your answer, then click to reveal ↻'; $('cardMastery').textContent = allCards().filter(c => labState.ratings[c.id] === 'know').length + ' / ' + allCards().length + ' self-rated recalled'; }
+function allCards() { return sessionCards.map(c => ({ ...c, topic: 'Your studies' })); }
+function buildDeck() { deck = allCards().filter(c => !difficultOnly || sessionRatings[c.id] === 'again'); cardIndex = Math.min(cardIndex, Math.max(0, deck.length - 1)); renderCard(); }
+function renderCard() { cardFlipped = false; const card = deck[cardIndex]; $('cardRating').hidden = true; $('flashcard').classList.remove('is-answer'); $('flashcard').setAttribute('aria-label', 'Reveal flashcard answer'); $('deleteCard').hidden = !card || !sessionCards.some(c => c.id === card.id); $('flashcard').disabled = !card; $('prevCard').disabled = deck.length < 2; $('nextCard').disabled = deck.length < 2; $('cardCounter').textContent = card ? 'Card ' + (cardIndex + 1) + ' / ' + deck.length : (difficultOnly ? 'No difficult cards' : 'Your deck is empty'); $('cardTopic').textContent = card?.topic || 'This visit'; $('cardSide').textContent = 'Question'; $('cardContent').textContent = card?.q || (difficultOnly ? 'No cards need extra practice. Switch to All cards or add a new question.' : 'Add your first question and checked answer to start practicing.'); $('flipHint').hidden = !card; $('flipHint').textContent = 'Think of your answer, then click to reveal ↻'; $('downloadCards').disabled = sessionCards.length === 0; $('difficultCards').disabled = sessionCards.length === 0; $('allCards').disabled = sessionCards.length === 0; $('cardMastery').textContent = allCards().filter(c => sessionRatings[c.id] === 'know').length + ' / ' + allCards().length + ' self-rated recalled'; }
 $('flashcard').onclick = () => { const card = deck[cardIndex]; if (!card) return; cardFlipped = !cardFlipped; $('flashcard').classList.toggle('is-answer', cardFlipped); $('cardSide').textContent = cardFlipped ? 'Answer' : 'Question'; $('cardContent').textContent = cardFlipped ? card.a : card.q; $('flipHint').textContent = cardFlipped ? 'Compare with your attempt. How did you do?' : 'Think of your answer, then click to reveal ↻'; $('flashcard').setAttribute('aria-label', cardFlipped ? 'Show flashcard question' : 'Reveal flashcard answer'); $('cardRating').hidden = !cardFlipped; };
-function moveCard(delta) { cardIndex = (cardIndex + delta + deck.length) % deck.length; renderCard(); $('cardStatus').textContent = ''; }
+function moveCard(delta) { if (!deck.length) return; cardIndex = (cardIndex + delta + deck.length) % deck.length; renderCard(); $('cardStatus').textContent = ''; }
 $('prevCard').onclick = () => moveCard(-1); $('nextCard').onclick = () => moveCard(1);
-function rateCard(rating) { const card = deck[cardIndex]; if (!card || !cardFlipped) return; labState.ratings[card.id] = rating; persist(); if (difficultOnly && rating === 'know') { buildDeck(); } else { moveCard(1); } $('cardStatus').textContent = rating === 'know' ? 'Marked recalled. Try it again after a delay.' : 'Added to difficult cards. Check the gap and return later.'; }
+function rateCard(rating) { const card = deck[cardIndex]; if (!card || !cardFlipped) return; sessionRatings[card.id] = rating; if (difficultOnly && rating === 'know') { buildDeck(); } else { moveCard(1); } $('cardStatus').textContent = rating === 'know' ? 'Marked recalled. Try it again after a delay.' : 'Added to difficult cards. Check the gap and return later.'; }
 $('cardAgain').onclick = () => rateCard('again'); $('cardKnow').onclick = () => rateCard('know');
 $('difficultCards').onclick = () => { difficultOnly = true; cardIndex = 0; buildDeck(); $('cardStatus').textContent = 'Showing cards you marked for more practice.'; }; $('allCards').onclick = () => { difficultOnly = false; cardIndex = 0; buildDeck(); $('cardStatus').textContent = 'Showing the full deck.'; };
-$('addCard').onsubmit = e => { e.preventDefault(); const q = $('customQuestion').value.trim(), a = $('customAnswer').value.trim(); if (!q || !a) { $('addCardStatus').textContent = 'Write both a question and an answer.'; return; } if (labState.customCards.length >= 30) { $('addCardStatus').textContent = 'Maximum 30 custom cards. Delete one to add another.'; return; } labState.customCards.push({ id: 'custom-' + uniqueID(), q, a }); persist(); difficultOnly = false; cardIndex = allCards().length - 1; buildDeck(); $('addCard').reset(); $('addCardStatus').textContent = storageAvailable ? 'Your card is saved and ready to practice.' : 'Card added for this visit; browser storage is unavailable.'; };
-$('deleteCard').onclick = () => { const card = deck[cardIndex]; if (!card) return; labState.customCards = labState.customCards.filter(c => c.id !== card.id); delete labState.ratings[card.id]; persist(); buildDeck(); $('cardStatus').textContent = 'Custom card deleted.'; };
+$('addCard').onsubmit = e => { e.preventDefault(); const q = $('customQuestion').value.trim(), a = $('customAnswer').value.trim(); if (!q || !a) { $('addCardStatus').textContent = 'Write both a question and an answer.'; return; } if (sessionCards.length >= 30) { $('addCardStatus').textContent = 'Maximum 30 custom cards. Delete one to add another.'; return; } sessionCards.push({ id: 'custom-' + uniqueID(), q, a }); difficultOnly = false; cardIndex = allCards().length - 1; buildDeck(); $('addCard').reset(); $('addCardStatus').textContent = 'Card added for this visit. Download your cards before leaving or reloading.'; $('customQuestion').focus(); };
+$('deleteCard').onclick = () => { const card = deck[cardIndex]; if (!card) return; sessionCards = sessionCards.filter(c => c.id !== card.id); delete sessionRatings[card.id]; buildDeck(); $('cardStatus').textContent = 'Custom card deleted.'; };
 
 // Reflection and downloadable record. Never render user text as HTML.
 $('reflectionText').value = labState.reflection;
 $('saveReflection').onclick = () => { const text = $('reflectionText').value.trim(); if (!text) { $('reflectionStatus').textContent = 'Write a reflection before saving.'; $('reflectionText').focus(); return; } labState.reflection = text; complete('reflection'); $('reflectionStatus').textContent = storageAvailable ? 'Reflection saved in this browser.' : 'Reflection kept for this visit. Download it before leaving.'; };
-$('downloadReflection').onclick = () => { const text = $('reflectionText').value.trim(); const report = ['TRAIN YOUR BRAIN — LEARNING NOTEBOOK', 'Exported: ' + new Date().toLocaleString(), '', 'REFLECTION', text || '(No reflection written yet.)', '', 'CHECKPOINTS', ...Object.entries(checkpointNames).map(([k, v]) => (labState.checkpoints[k] ? '[x] ' : '[ ] ') + v), '', 'COMPLETED FOCUS SESSIONS: ' + labState.sessions, '', 'REVIEW PLANS', ...labState.plans.map(p => p.topic + ' · first studied ' + p.date + '\n' + [1, 3, 7, 14].map((d, i) => (p.done[i] ? '[x] ' : '[ ] ') + localISO(reviewDate(p.date, d))).join('\n')), '', 'CUSTOM FLASHCARDS', ...labState.customCards.map(c => 'Q: ' + c.q + '\nA: ' + c.a), '', 'Activity progress is self-reported and is not a course grade.']; downloadFile('my-learning-notebook.txt', report.join('\n'), 'text/plain;charset=utf-8'); $('reflectionStatus').textContent = 'Notebook downloaded, including the current reflection text.'; };
+$('downloadReflection').onclick = () => { const text = $('reflectionText').value.trim(); const report = ['TRAIN YOUR BRAIN — LEARNING NOTEBOOK', 'Exported: ' + new Date().toLocaleString(), '', 'REFLECTION', text || '(No reflection written yet.)', '', 'CHECKPOINTS', ...Object.entries(checkpointNames).map(([k, v]) => (labState.checkpoints[k] ? '[x] ' : '[ ] ') + v), '', 'COMPLETED FOCUS SESSIONS: ' + labState.sessions, '', 'REVIEW PLANS', ...labState.plans.map(p => p.topic + ' · first studied ' + p.date + '\n' + [1, 3, 7, 14].map((d, i) => (p.done[i] ? '[x] ' : '[ ] ') + localISO(reviewDate(p.date, d))).join('\n')), '', 'CUSTOM FLASHCARDS', ...sessionCards.map(c => 'Q: ' + c.q + '\nA: ' + c.a), '', 'Activity progress is self-reported and is not a course grade.']; downloadFile('my-learning-notebook.txt', report.join('\n'), 'text/plain;charset=utf-8'); $('reflectionStatus').textContent = 'Notebook downloaded, including the current reflection text.'; };
 $('clearProgress').onclick = () => { $('resetConfirm').hidden = false; $('confirmReset').focus(); }; $('cancelReset').onclick = () => { $('resetConfirm').hidden = true; $('clearProgress').focus(); };
-$('confirmReset').onclick = () => { labState = blankState(); persist(); $('reflectionText').value = ''; $('sessionCount').textContent = '0'; $('reflectionStatus').textContent = 'Saved lab data cleared.'; $('plannerStatus').textContent = ''; $('resetConfirm').hidden = true; generatedPlan = null; $('planActions').hidden = true; difficultOnly = false; cardIndex = 0; updateProgress(); renderPlans(); buildDeck(); $('clearProgress').focus(); };
-updateProgress(); renderPlans(); buildDeck(); if (!storageAvailable) persist();
+$('confirmReset').onclick = () => { labState = blankState(); sessionCards = []; sessionRatings = {}; persist(); $('reflectionText').value = ''; $('sessionCount').textContent = '0'; $('reflectionStatus').textContent = 'Saved lab data cleared.'; $('plannerStatus').textContent = ''; $('resetConfirm').hidden = true; generatedPlan = null; $('planActions').hidden = true; difficultOnly = false; cardIndex = 0; updateProgress(); renderPlans(); buildDeck(); $('clearProgress').focus(); };
+updateProgress(); renderPlans(); buildDeck(); persist();
 
 // RFC 5545 content-line folding without splitting UTF-8 code points.
 function foldCalendarLine(line) {
@@ -126,3 +119,25 @@ function foldCalendarLine(line) {
   }
   return result;
 }
+
+// Export the full session deck, including cards outside the current filter.
+function flashcardNotes(cards, ratings) {
+  return [
+    'TRAIN YOUR BRAIN — MY FLASHCARDS',
+    'Created: ' + new Date().toLocaleString(),
+    'Try each question before reading its answer.',
+    '',
+    ...cards.map((card, index) => [
+      'CARD ' + (index + 1),
+      'Question: ' + card.q,
+      'Answer: ' + card.a,
+      'Self-rating: ' + (ratings[card.id] === 'know' ? 'Recalled it' : ratings[card.id] === 'again' ? 'Practice again' : 'Not rated'),
+      ''
+    ].join('\n'))
+  ].join('\n');
+}
+$('downloadCards').onclick = () => {
+  if (!sessionCards.length) return;
+  downloadFile('my-flashcards.txt', flashcardNotes(sessionCards, sessionRatings), 'text/plain;charset=utf-8');
+  $('cardStatus').textContent = 'Flashcard notes prepared for download. Keep this file before leaving the page.';
+};
